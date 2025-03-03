@@ -1113,8 +1113,18 @@ func getPlayerWeapon(player *common.Player, wepType common.EquipmentType) *commo
 
 func mapGameEventData(d *msg.CSVCMsg_GameEventListDescriptorT, e *msg.CSVCMsg_GameEvent) map[string]*msg.CSVCMsg_GameEventKeyT {
 	data := make(map[string]*msg.CSVCMsg_GameEventKeyT, len(d.Keys))
+
+	// Make sure we don't go out of bounds
+	maxKeys := len(e.Keys)
+
 	for i, k := range d.Keys {
-		data[k.GetName()] = e.Keys[i]
+		// Check if the index is within bounds
+		if i < maxKeys {
+			data[k.GetName()] = e.Keys[i]
+		} else {
+			// If out of bounds, add a null/empty key
+			data[k.GetName()] = &msg.CSVCMsg_GameEventKeyT{}
+		}
 	}
 
 	return data
